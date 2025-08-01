@@ -8,7 +8,43 @@ import java.sql.*;
 import java.util.Calendar;
 import java.util.Map;
 
+import org.postgresql.util.PGobject;
+
+import fr.example.springjdbccli.JsonBox;
+
 public class MagicResultSet implements ResultSet {
+
+    public Object noConversion(Object x) {
+        // Convertion should be explicit
+        return x;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T,U> Class<T> mapType(Class<U> type) {
+        if (type == JsonBox.class) {
+            return (Class<T>)PGobject.class;
+        } else {
+            return (Class<T>)type;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T convertFromSqlType(Object x, Class<T> type) {
+        if (type == JsonBox.class) {
+            if (x instanceof PGobject pgo) {
+                if (pgo.getType().equals("jsonb")) {
+                    return (T) new JsonBox(pgo.getValue());
+                }
+            }
+            throw new RuntimeException("Unsupported conversion");
+        }
+        else {
+            if (! type.isInstance(type)) {
+                throw new RuntimeException("Unsupported conversion");
+            }
+            return (T) x;
+        }
+    }
 
     final ResultSet resultSet;
 
@@ -217,12 +253,12 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public Object getObject(int columnIndex) throws SQLException {
-        return resultSet.getObject(columnIndex);
+        return noConversion(resultSet.getObject(columnIndex));
     }
 
     @Override
     public Object getObject(String columnLabel) throws SQLException {
-        return resultSet.getObject(columnLabel);
+        return noConversion(resultSet.getObject(columnLabel));
     }
 
     @Override
@@ -587,7 +623,7 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
-        return resultSet.getObject(columnIndex, map);
+        return noConversion(resultSet.getObject(columnIndex, map)); // TODO
     }
 
     @Override
@@ -612,7 +648,7 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public Object getObject(String columnLabel, Map<String, Class<?>> map) throws SQLException {
-        return resultSet.getObject(columnLabel, map);
+        return noConversion(resultSet.getObject(columnLabel, map)); // TODO
     }
 
     @Override
@@ -957,12 +993,12 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-        return resultSet.getObject(columnIndex, type);
+        return convertFromSqlType(resultSet.getObject(columnIndex, mapType(type)), type);
     }
 
     @Override
     public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
-        return resultSet.getObject(columnLabel, type);
+        return convertFromSqlType(resultSet.getObject(columnLabel, mapType(type)), type);
     }
 
     @Override

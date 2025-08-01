@@ -29,7 +29,7 @@ import fr.example.springjdbccli.JsonBox;
 
 public class MagicPreparedStatement implements PreparedStatement {
 
-    public Object convertTo(Object x) {
+    public Object convertToSqlType(Object x) {
         switch(x) {
             case JsonBox jsonBox -> {
                 try {
@@ -46,13 +46,6 @@ public class MagicPreparedStatement implements PreparedStatement {
             }
         }        
     }
-
-    // public Object convertFrom(Object x) {
-    //     // Implement your conversion logic here
-    //     // For example, if you want to convert from JSON or any other format
-    //     return x; // Placeholder, replace with actual conversion logic
-    // }
-
 
     private final PreparedStatement preparedStatement;
 
@@ -518,13 +511,13 @@ public class MagicPreparedStatement implements PreparedStatement {
 
     @Override
     public void setObject(int parameterIndex, Object x) throws SQLException {
-        preparedStatement.setObject(parameterIndex, convertTo(x));
+        preparedStatement.setObject(parameterIndex, convertToSqlType(x));
     }
 
     @Override
     public void setObject(int parameterIndex, Object x, int targetSqlType)
             throws SQLException {
-        preparedStatement.setObject(parameterIndex, convertTo(x), targetSqlType);
+        preparedStatement.setObject(parameterIndex, convertToSqlType(x), targetSqlType);
     }
 
     @Override
@@ -536,7 +529,7 @@ public class MagicPreparedStatement implements PreparedStatement {
     ) throws SQLException {
         preparedStatement.setObject(
                 parameterIndex,
-                convertTo(x),
+                convertToSqlType(x),
                 targetSqlType,
                 scaleOrLength
         );
