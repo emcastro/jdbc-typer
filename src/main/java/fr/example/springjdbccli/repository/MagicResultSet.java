@@ -26,7 +26,7 @@ public class MagicResultSet implements ResultSet {
     }
 
     @SuppressWarnings("unchecked")
-    public <T,U> Class<T> mapType(Class<U> type) {
+    private <T,U> Class<T> mapType(Class<U> type) {
         if (type == JsonBox.class) {
             return (Class<T>)PGobject.class;
         } else {
@@ -999,7 +999,7 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-        return convertFromSqlType(resultSet.getObject(columnIndex, mapType(type)), type);
+    return convertFromSqlType(resultSet.getObject(columnIndex, mapType(type)), type);
     }
 
     @Override
