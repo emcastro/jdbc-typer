@@ -1,4 +1,4 @@
-package fr.emcastro.jdbctyper.repository;
+package fr.emcastro.jdbctyper.jdbc;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.Calendar;
 import java.util.Map;
 
-import fr.emcastro.jdbctyper.JsonBox;
+import fr.emcastro.jdbctyper.transform.TypeTransformerRegistry;
 
 public class MagicResultSet implements ResultSet {
 
@@ -24,19 +24,8 @@ public class MagicResultSet implements ResultSet {
         return (Class<T>)type;
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T convertFromSqlType(Object x, Class<T> type) {
-        // Simplified conversion - in a real implementation, we might handle specific type conversions
-        if (type == JsonBox.class) {
-            if (x instanceof String str) {
-                return (T) new JsonBox(str);
-            }
-        }
-        // For other types, just cast if possible
-        if (type.isInstance(x)) {
-            return (T) x;
-        }
-        throw new RuntimeException("Unsupported conversion from " + x.getClass() + " to " + type.getName());
+        return TypeTransformerRegistry.fromSql(x, type);
     }
 
     final ResultSet resultSet;

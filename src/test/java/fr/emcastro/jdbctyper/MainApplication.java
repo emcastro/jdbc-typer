@@ -1,7 +1,7 @@
 package fr.emcastro.jdbctyper;
 
-import fr.emcastro.jdbctyper.repository.ExampleRepository;
 import fr.emcastro.jdbctyper.JsonBox;
+import fr.emcastro.jdbctyper.spring.ExampleRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

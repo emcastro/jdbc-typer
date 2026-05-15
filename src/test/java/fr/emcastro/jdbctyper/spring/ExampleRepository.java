@@ -1,4 +1,4 @@
-package fr.emcastro.jdbctyper.repository;
+package fr.emcastro.jdbctyper.spring;
 
 import fr.emcastro.jdbctyper.JsonBox;
 import java.sql.Connection;

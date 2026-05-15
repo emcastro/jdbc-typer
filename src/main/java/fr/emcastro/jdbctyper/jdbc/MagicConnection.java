@@ -1,4 +1,4 @@
-package fr.emcastro.jdbctyper.repository;
+package fr.emcastro.jdbctyper.jdbc;
 
 import java.sql.Array;
 import java.sql.Blob;

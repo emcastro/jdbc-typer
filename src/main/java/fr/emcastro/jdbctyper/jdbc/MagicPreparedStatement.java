@@ -1,4 +1,4 @@
-package fr.emcastro.jdbctyper.repository;
+package fr.emcastro.jdbctyper.jdbc;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -23,17 +23,12 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
-import fr.emcastro.jdbctyper.JsonBox;
+import fr.emcastro.jdbctyper.transform.TypeTransformerRegistry;
 
 public class MagicPreparedStatement implements PreparedStatement {
 
     public Object convertToSqlType(Object x) {
-        // For JsonBox, we convert to String for storage in DuckDB
-        // In a more sophisticated implementation, we might use a specific JSON type
-        if (x instanceof JsonBox jsonBox) {
-            return jsonBox.value();
-        }
-        return x;
+        return TypeTransformerRegistry.toSql(x);
     }
 
     private final PreparedStatement preparedStatement;
