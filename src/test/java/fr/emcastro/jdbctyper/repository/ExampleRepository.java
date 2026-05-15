@@ -7,11 +7,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
+import org.springframework.stereotype.Component;
+
 /**
- * Repository that works with JSON data using plain JDBC.
- * This implementation avoids Spring-specific dependencies to keep the core library lightweight.
- * Spring/JdbcClient usage should be confined to unit tests only.
+ * Test repository that works with JSON data using plain JDBC.
+ * Uses Spring @Component for dependency injection in demo/test context.
  */
+@Component
 public class ExampleRepository {
 
   private final DataSource dataSource;
@@ -25,7 +27,7 @@ public class ExampleRepository {
   public record Y(JsonBox name) {}
 
   public Object work(JsonBox id) {
-    String sql = "SELECT (?->'a') name";
+    String sql = "SELECT name: (?->'a')";
     
     try (Connection connection = dataSource.getConnection();
          PreparedStatement statement = connection.prepareStatement(sql)) {
