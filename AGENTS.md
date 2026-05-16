@@ -6,5 +6,6 @@
 - Do not change tests without a direct order from the user
 - Format markdown with MarkdownList style
 - Use `mvnd` instead of `mvn` when available
+- Do not remove not change a TODO comment unless you have actually corrected the problem it describes. If you believe the problem is already solved, you may only notify the user — you must not remove the TODO yourself.
 
 See [ROADMAP.md](./ROADMAP.md) for short-term objectives.

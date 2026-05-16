@@ -5,30 +5,26 @@ import fr.emcastro.jdbctyper.transform.TypeTransformer;
 
 /**
  * Transforms {@link JsonBox} to/from {@code String} for JDBC operations.
- * Registered in {@code JdbcConfig} via {@code @PostConstruct}.
  */
-public class JsonBoxTypeTransformer implements TypeTransformer<JsonBox> {
+public class JsonBoxTypeTransformer implements TypeTransformer<JsonBox, String> {
 
     @Override
-    public Class<JsonBox> getType() {
+    public Class<JsonBox> getAppType() {
         return JsonBox.class;
     }
 
     @Override
-    public Class<?> getSqlType() {
+    public Class<String> getSqlType() {
         return String.class;
     }
 
     @Override
-    public Object toSql(JsonBox value) {
+    public String toSql(JsonBox value) {
         return value.value();
     }
 
     @Override
-    public JsonBox fromSql(Object value) {
-        if (value instanceof String str) {
-            return new JsonBox(str);
-        }
-        throw new TypeConversionException("Cannot convert " + value.getClass() + " to JsonBox", null);
+    public JsonBox fromSql(String value) {
+        return new JsonBox(value);
     }
 }

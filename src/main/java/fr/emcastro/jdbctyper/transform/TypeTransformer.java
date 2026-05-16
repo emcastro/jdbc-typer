@@ -10,9 +10,10 @@ package fr.emcastro.jdbctyper.transform;
  * <p>Example: a {@code JsonBox} transformer converts {@code JsonBox} to {@code String}
  * for {@code setObject()}, and {@code String} back to {@code JsonBox} for {@code getObject()}.
  *
- * @param <T> the application type handled by this transformer
+ * @param <A> the application type handled by this transformer
+ * @param <S> the JDBC SQL type this transformer maps to
  */
-public interface TypeTransformer<T> {
+public interface TypeTransformer<A, S> {
 
     /**
      * Returns the application type this transformer handles.
@@ -20,7 +21,7 @@ public interface TypeTransformer<T> {
      *
      * @return the application class (e.g. {@code JsonBox.class})
      */
-    Class<T> getType();
+    Class<A> getAppType();
 
     /**
      * Returns the JDBC SQL type that this transformer maps to.
@@ -29,25 +30,25 @@ public interface TypeTransformer<T> {
      *
      * @return the SQL type class (e.g. {@code String.class})
      */
-    Class<?> getSqlType();
+    Class<S> getSqlType();
 
     /**
      * Converts an application value to its JDBC representation.
      * Called by {@code MagicPreparedStatement.setObject()} when a parameter
-     * of type {@code T} is passed.
+     * of type {@code A} is passed.
      *
-     * @param value the application value (never null)
-     * @return the JDBC-compatible value
+     * @param appValue the application value (never null)
+     * @return the JDBC-compatible value of type {@code S}
      */
-    Object toSql(T value);
+    S toSql(A appValue);
 
     /**
      * Converts a JDBC value to the application type.
      * Called by {@code MagicResultSet.getObject(columnIndex, type)} after
      * the driver returns a value of the type declared by {@link #getSqlType}.
      *
-     * @param value the JDBC value (never null)
-     * @return the application value of type {@code T}
+     * @param sqlValue the JDBC value (never null)
+     * @return the application value of type {@code A}
      */
-    T fromSql(Object value);
+    A fromSql(S sqlValue);
 }

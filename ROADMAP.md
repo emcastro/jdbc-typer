@@ -4,5 +4,5 @@
 - [x] Confine Spring usage (`JdbcTemplate`, etc.) to test scope
 - [x] Propose a package name → `fr.emcastro.jdbctyper`
 - [ ] Define DuckDB test strategy (spatial extension, in-memory)
-- [ ] Inject type transformations via a pluggable interface (TBD)
+- [x] Inject type transformations via a pluggable interface
 - [ ] Prepare project for Maven Central publication

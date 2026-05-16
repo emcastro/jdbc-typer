@@ -8,22 +8,26 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import fr.emcastro.jdbctyper.transform.TypeTransformerRegistry;
+
 public class MagicDatasource implements DataSource {
 
-    final DataSource dataSource;
+    private final DataSource dataSource;
+    private final TypeTransformerRegistry registry;
 
-    public MagicDatasource(DataSource dataSource) {
+    public MagicDatasource(DataSource dataSource, TypeTransformerRegistry registry) {
         this.dataSource = dataSource;
+        this.registry = registry;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        return new MagicConnection(dataSource.getConnection());
+        return new MagicConnection(dataSource.getConnection(), registry);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return new MagicConnection(dataSource.getConnection(username, password));
+        return new MagicConnection(dataSource.getConnection(username, password), registry);
     }
 
     @Override

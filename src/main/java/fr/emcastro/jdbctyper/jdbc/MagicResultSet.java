@@ -8,18 +8,16 @@ import java.sql.*;
 import java.util.Calendar;
 import java.util.Map;
 
-import static fr.emcastro.jdbctyper.transform.TypeTransformerRegistry.*;
+import fr.emcastro.jdbctyper.transform.TypeTransformerRegistry;
 
 public class MagicResultSet implements ResultSet {
 
-    public <T> T convertFromSqlType(Object x, Class<T> type) {
-        return fromSql(x, type);
-    }
+    private final ResultSet resultSet;
+    private final TypeTransformerRegistry registry;
 
-    final ResultSet resultSet;
-
-    public MagicResultSet(ResultSet resultSet) {
+    public MagicResultSet(ResultSet resultSet, TypeTransformerRegistry registry) {
         this.resultSet = resultSet;
+        this.registry = registry;
     }
 
     @Override
@@ -223,12 +221,12 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public Object getObject(int columnIndex) throws SQLException {
-        return defaultFromSql(resultSet.getObject(columnIndex));
+        return registry.fromSqlDefaultType(resultSet.getObject(columnIndex));
     }
 
     @Override
     public Object getObject(String columnLabel) throws SQLException {
-        return defaultFromSql(resultSet.getObject(columnLabel));
+        return registry.fromSqlDefaultType(resultSet.getObject(columnLabel));
     }
 
     @Override
@@ -448,12 +446,12 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public void updateObject(int columnIndex, Object x, int scaleOrLength) throws SQLException {
-        resultSet.updateObject(columnIndex, toSql(x), scaleOrLength);
+        resultSet.updateObject(columnIndex, registry.toSql(x), scaleOrLength);
     }
 
     @Override
     public void updateObject(int columnIndex, Object x) throws SQLException {
-        resultSet.updateObject(columnIndex, toSql(x));
+        resultSet.updateObject(columnIndex, registry.toSql(x));
     }
 
     @Override
@@ -543,12 +541,12 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public void updateObject(String columnLabel, Object x, int scaleOrLength) throws SQLException {
-        resultSet.updateObject(columnLabel, toSql(x), scaleOrLength);
+        resultSet.updateObject(columnLabel, registry.toSql(x), scaleOrLength);
     }
 
     @Override
     public void updateObject(String columnLabel, Object x) throws SQLException {
-        resultSet.updateObject(columnLabel, toSql(x));
+        resultSet.updateObject(columnLabel, registry.toSql(x));
     }
 
     @Override
@@ -593,7 +591,9 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {
-        return defaultFromSql(resultSet.getObject(columnIndex, map));
+        // TODO Need to clarify the behavior of this method: 
+        // should it apply the registry mapping like getObject(columnLabel, Class<T>) or just return the raw value?
+        return registry.fromSqlDefaultType(resultSet.getObject(columnIndex, map));
     }
 
     @Override
@@ -618,7 +618,9 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public Object getObject(String columnLabel, Map<String, Class<?>> map) throws SQLException {
-        return defaultFromSql(resultSet.getObject(columnLabel, map));
+        // TODO Need to clarify the behavior of this method: 
+        // should it apply the registry mapping like getObject(columnLabel, Class<T>) or just return the raw value?
+        return registry.fromSqlDefaultType(resultSet.getObject(columnLabel, map));
     }
 
     @Override
@@ -963,32 +965,32 @@ public class MagicResultSet implements ResultSet {
 
     @Override
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-        return convertFromSqlType(resultSet.getObject(columnIndex, mapType(type)), type);
+        return registry.fromSql(resultSet.getObject(columnIndex, registry.mapType(type)), type);
     }
 
     @Override
     public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
-        return convertFromSqlType(resultSet.getObject(columnLabel, mapType(type)), type);
+        return registry.fromSql(resultSet.getObject(columnLabel, registry.mapType(type)), type);
     }
 
     @Override
     public void updateObject(int columnIndex, Object x, SQLType targetSqlType, int scaleOrLength) throws SQLException {
-        resultSet.updateObject(columnIndex, toSql(x), targetSqlType, scaleOrLength);
+        resultSet.updateObject(columnIndex, registry.toSql(x), targetSqlType, scaleOrLength);
     }
 
     @Override
     public void updateObject(String columnLabel, Object x, SQLType targetSqlType, int scaleOrLength) throws SQLException {
-        resultSet.updateObject(columnLabel, toSql(x), targetSqlType, scaleOrLength);
+        resultSet.updateObject(columnLabel, registry.toSql(x), targetSqlType, scaleOrLength);
     }
 
     @Override
     public void updateObject(int columnIndex, Object x, SQLType targetSqlType) throws SQLException {
-        resultSet.updateObject(columnIndex, toSql(x), targetSqlType);
+        resultSet.updateObject(columnIndex, registry.toSql(x), targetSqlType);
     }
 
     @Override
     public void updateObject(String columnLabel, Object x, SQLType targetSqlType) throws SQLException {
-        resultSet.updateObject(columnLabel, toSql(x), targetSqlType);
+        resultSet.updateObject(columnLabel, registry.toSql(x), targetSqlType);
     }
 
     @Override
