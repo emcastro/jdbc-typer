@@ -1,4 +1,4 @@
-package fr.emcastro.jdbctyper.jdbc;
+package fr.emcastro.jdbcretyper.jdbc;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -8,14 +8,14 @@ import java.sql.*;
 import java.util.Calendar;
 import java.util.Map;
 
-import fr.emcastro.jdbctyper.transform.TypeTransformerRegistry;
+import fr.emcastro.jdbcretyper.transform.TypeTransformerRegistry;
 
-public class TyperResultSet implements ResultSet {
+public class RetyperResultSet implements ResultSet {
 
     private final ResultSet resultSet;
     private final TypeTransformerRegistry registry;
 
-    public TyperResultSet(ResultSet resultSet, TypeTransformerRegistry registry) {
+    public RetyperResultSet(ResultSet resultSet, TypeTransformerRegistry registry) {
         this.resultSet = resultSet;
         this.registry = registry;
     }

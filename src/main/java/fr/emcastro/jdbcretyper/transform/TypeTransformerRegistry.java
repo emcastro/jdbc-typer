@@ -1,11 +1,11 @@
-package fr.emcastro.jdbctyper.transform;
+package fr.emcastro.jdbcretyper.transform;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.emcastro.jdbctyper.exception.TypeConversionException;
+import fr.emcastro.jdbcretyper.exception.TypeConversionException;
 
 public class TypeTransformerRegistry {
 

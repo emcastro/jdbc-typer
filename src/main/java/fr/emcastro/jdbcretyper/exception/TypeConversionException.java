@@ -1,4 +1,4 @@
-package fr.emcastro.jdbctyper.exception;
+package fr.emcastro.jdbcretyper.exception;
 
 public class TypeConversionException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package fr.emcastro.jdbctyper.jdbc;
+package fr.emcastro.jdbcretyper.jdbc;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -6,15 +6,15 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 
-import fr.emcastro.jdbctyper.transform.TypeTransformerRegistry;
+import fr.emcastro.jdbcretyper.transform.TypeTransformerRegistry;
 
-public class TyperStatement implements Statement {
+public class RetyperStatement implements Statement {
 
     protected final Statement statement;
     protected final TypeTransformerRegistry registry;
-    private final TyperConnection connection;
+    private final RetyperConnection connection;
 
-    public TyperStatement(Statement statement, TypeTransformerRegistry registry, TyperConnection connection) {
+    public RetyperStatement(Statement statement, TypeTransformerRegistry registry, RetyperConnection connection) {
         this.statement = statement;
         this.registry = registry;
         this.connection = connection;
@@ -77,7 +77,7 @@ public class TyperStatement implements Statement {
 
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
-        return new TyperResultSet(statement.executeQuery(sql), registry);
+        return new RetyperResultSet(statement.executeQuery(sql), registry);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class TyperStatement implements Statement {
 
     @Override
     public ResultSet getGeneratedKeys() throws SQLException {
-        return new TyperResultSet(statement.getGeneratedKeys(), registry);
+        return new RetyperResultSet(statement.getGeneratedKeys(), registry);
     }
 
     @Override
@@ -147,7 +147,7 @@ public class TyperStatement implements Statement {
 
     @Override
     public ResultSet getResultSet() throws SQLException {
-        return new TyperResultSet(statement.getResultSet(), registry);
+        return new RetyperResultSet(statement.getResultSet(), registry);
     }
 
     @Override

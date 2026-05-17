@@ -1,4 +1,4 @@
-package fr.emcastro.jdbctyper.jdbc;
+package fr.emcastro.jdbcretyper.jdbc;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -19,12 +19,12 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
 
-import fr.emcastro.jdbctyper.transform.TypeTransformerRegistry;
+import fr.emcastro.jdbcretyper.transform.TypeTransformerRegistry;
 
-public class TyperCallableStatement extends TyperPreparedStatement implements CallableStatement {
+public class RetyperCallableStatement extends RetyperPreparedStatement implements CallableStatement {
 
-    public TyperCallableStatement(
-            CallableStatement callableStatement, TypeTransformerRegistry registry, TyperConnection connection) {
+    public RetyperCallableStatement(
+            CallableStatement callableStatement, TypeTransformerRegistry registry, RetyperConnection connection) {
         super(callableStatement, registry, connection);
     }
 

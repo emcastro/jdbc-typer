@@ -1,4 +1,4 @@
-package fr.emcastro.jdbctyper.jdbc;
+package fr.emcastro.jdbcretyper.jdbc;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -21,12 +21,12 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
-import fr.emcastro.jdbctyper.transform.TypeTransformerRegistry;
+import fr.emcastro.jdbcretyper.transform.TypeTransformerRegistry;
 
-public class TyperPreparedStatement extends TyperStatement implements PreparedStatement {
+public class RetyperPreparedStatement extends RetyperStatement implements PreparedStatement {
 
-    public TyperPreparedStatement(
-            PreparedStatement preparedStatement, TypeTransformerRegistry registry, TyperConnection connection) {
+    public RetyperPreparedStatement(
+            PreparedStatement preparedStatement, TypeTransformerRegistry registry, RetyperConnection connection) {
         super(preparedStatement, registry, connection);
     }
 
@@ -51,7 +51,7 @@ public class TyperPreparedStatement extends TyperStatement implements PreparedSt
 
     @Override
     public ResultSet executeQuery() throws SQLException {
-        return new TyperResultSet(preparedStatement().executeQuery(), registry);
+        return new RetyperResultSet(preparedStatement().executeQuery(), registry);
     }
 
     @Override

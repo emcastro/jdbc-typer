@@ -1,4 +1,4 @@
-package fr.emcastro.jdbctyper.jdbc;
+package fr.emcastro.jdbcretyper.jdbc;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -8,26 +8,26 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import fr.emcastro.jdbctyper.transform.TypeTransformerRegistry;
+import fr.emcastro.jdbcretyper.transform.TypeTransformerRegistry;
 
-public class TyperDatasource implements DataSource {
+public class RetyperDatasource implements DataSource {
 
     private final DataSource dataSource;
     private final TypeTransformerRegistry registry;
 
-    public TyperDatasource(DataSource dataSource, TypeTransformerRegistry registry) {
+    public RetyperDatasource(DataSource dataSource, TypeTransformerRegistry registry) {
         this.dataSource = dataSource;
         this.registry = registry;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        return new TyperConnection(dataSource.getConnection(), registry);
+        return new RetyperConnection(dataSource.getConnection(), registry);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return new TyperConnection(dataSource.getConnection(username, password), registry);
+        return new RetyperConnection(dataSource.getConnection(username, password), registry);
     }
 
     @Override
