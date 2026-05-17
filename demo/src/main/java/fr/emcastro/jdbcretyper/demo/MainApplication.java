@@ -25,7 +25,9 @@ public class MainApplication {
         return args -> {
             System.out.println("Demo application started");
 
-            var jsonBox = new JsonBox("{\"a\": {\"name\":\"a\"}, \"b\": 42}");
+            var jsonBox = new JsonBox("""
+                    {"a": {"name":"a"}, "b": 42}
+                    """);
             System.out.println("Input: " + jsonBox);
             System.out.println();
 

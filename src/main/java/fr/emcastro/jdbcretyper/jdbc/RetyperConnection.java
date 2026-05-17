@@ -31,11 +31,21 @@ public class RetyperConnection implements Connection {
         this.registry = registry;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Follows the HikariCP wrapper pattern: returns {@code true} if this wrapper itself
+     * implements the requested type, or delegates to the underlying JDBC driver.</p>
+     */
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return iface.isInstance(connection) || connection.isWrapperFor(iface);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Follows the HikariCP wrapper pattern: unwraps to this wrapper if it implements the
+     * requested type, otherwise delegates to the underlying JDBC driver recursively.</p>
+     */
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         if (iface.isInstance(connection)) {

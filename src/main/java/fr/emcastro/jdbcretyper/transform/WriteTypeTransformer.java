@@ -1,0 +1,40 @@
+package fr.emcastro.jdbcretyper.transform;
+
+/**
+ * Type transformer for the writing direction: from application types to JDBC SQL values.
+ *
+ * <p>Implementations are registered in {@link TypeTransformerRegistry#registerWrite(WriteTypeTransformer)}
+ * and are invoked automatically by {@code RetyperPreparedStatement} when writing parameters.
+ *
+ * @param <A> the application type (e.g. {@code JsonBox}, {@code Point})
+ * @param <P> the JDBC parameter type used for {@code setObject()} (e.g. {@code String}, {@code byte[]})
+ */
+public interface WriteTypeTransformer<A, P> {
+
+    /**
+     * Returns the application type this transformer handles.
+     * Used by the registry to find the correct transformer for a given value.
+     *
+     * @return the application class (e.g. {@code JsonBox.class})
+     */
+    Class<A> getAppType();
+
+    /**
+     * Returns the JDBC parameter type that this transformer writes to.
+     * Used by {@code PreparedStatement.setObject()} to pass the correct
+     * underlying type to the driver.
+     *
+     * @return the parameter type class (e.g. {@code String.class})
+     */
+    Class<P> getWriteSqlType();
+
+    /**
+     * Converts an application value to its JDBC representation.
+     * Called by {@code RetyperPreparedStatement.setObject()} when a parameter
+     * of type {@code A} is passed.
+     *
+     * @param appValue the application value (never null)
+     * @return the JDBC-compatible value of type {@code P}
+     */
+    P toSql(A appValue);
+}

@@ -9,5 +9,7 @@
 - Do not remove not change a TODO comment unless you have actually corrected the problem it describes. If you believe the problem is already solved, you may only notify the user — you must not remove the TODO yourself.
 - Format code with a maximum line length of 120 characters with Palantir style.
 - Run `mvnd spotless:apply` to format code before committing.
+- Use `TEXT` for all text and string types (DDL, SQL casts, comments). Do not use `VARCHAR`.
+- When writing JSON strings in Java, use text block (`"""`) syntax for readability.
 
 See [ROADMAP.md](./ROADMAP.md) for short-term objectives.

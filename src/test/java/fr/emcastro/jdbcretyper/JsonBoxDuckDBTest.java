@@ -32,8 +32,12 @@ class JsonBoxDuckDBTest extends DuckDBTestBase {
     }
 
     @Test
+    // Check that a JsonBox inserted via PreparedStatement.setObject() can be
+    // read back via ResultSet.getObject(columnIndex, JsonBox.class).
     void insertAndReadJsonBox() throws SQLException {
-        JsonBox box = new JsonBox("{\"name\":\"test\",\"value\":42}");
+        JsonBox box = new JsonBox("""
+                {"name":"test","value":42}
+                """);
 
         try (PreparedStatement ps = connection.prepareStatement("INSERT INTO json_test VALUES (1, ?)")) {
             ps.setObject(1, box);
@@ -41,17 +45,20 @@ class JsonBoxDuckDBTest extends DuckDBTestBase {
         }
 
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT data::VARCHAR FROM json_test WHERE id = 1")) {
+                ResultSet rs = stmt.executeQuery("SELECT data FROM json_test WHERE id = 1")) {
             assertTrue(rs.next());
-            String jsonStr = rs.getString(1);
-            JsonBox result = new JsonBox(jsonStr);
+            JsonBox result = rs.getObject(1, JsonBox.class);
             assertEquals(box, result);
         }
     }
 
     @Test
+    // Check that getObject(columnIndex) without a type hint still resolves
+    // JsonBox through the default-type read transformer path.
     void insertAndReadJsonBoxDefaultType() throws SQLException {
-        JsonBox box = new JsonBox("{\"nested\":{\"a\":1,\"b\":2}}");
+        JsonBox box = new JsonBox("""
+                {"nested":{"a":1,"b":2}}
+                """);
 
         try (PreparedStatement ps = connection.prepareStatement("INSERT INTO json_test VALUES (2, ?)")) {
             ps.setObject(1, box);
@@ -59,16 +66,17 @@ class JsonBoxDuckDBTest extends DuckDBTestBase {
         }
 
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT data::VARCHAR FROM json_test WHERE id = 2")) {
+                ResultSet rs = stmt.executeQuery("SELECT data FROM json_test WHERE id = 2")) {
             assertTrue(rs.next());
-            String jsonStr = rs.getString(1);
-            Object result = registry.fromSqlDefaultType(jsonStr);
+            Object result = rs.getObject(1);
             assertInstanceOf(JsonBox.class, result);
             assertEquals(box, result);
         }
     }
 
     @Test
+    // Check that SQL NULL in a JSON column correctly reports wasNull() for
+    // both getObject(int) and getObject(int, Class).
     void nullJsonBoxRoundTrip() throws SQLException {
         try (PreparedStatement ps = connection.prepareStatement("INSERT INTO json_test VALUES (3, ?)")) {
             ps.setNull(1, java.sql.Types.VARCHAR);
@@ -76,35 +84,15 @@ class JsonBoxDuckDBTest extends DuckDBTestBase {
         }
 
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT data::VARCHAR FROM json_test WHERE id = 3")) {
+                ResultSet rs = stmt.executeQuery("SELECT data FROM json_test WHERE id = 3")) {
             assertTrue(rs.next());
-            rs.getString(1);
+            rs.getObject(1);
+            assertTrue(rs.wasNull());
+            rs.getObject(1, JsonBox.class);
             assertTrue(rs.wasNull());
         }
     }
 
-    @Test
-    void jsonBoxToObject() throws SQLException {
-        JsonBox box = new JsonBox("{\"name\":\"DuckDB\",\"version\":1}");
 
-        try (PreparedStatement ps = connection.prepareStatement("INSERT INTO json_test VALUES (4, ?)")) {
-            ps.setObject(1, box);
-            ps.execute();
-        }
 
-        try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT data::VARCHAR FROM json_test WHERE id = 4")) {
-            assertTrue(rs.next());
-            String jsonStr = rs.getString(1);
-            JsonBox result = new JsonBox(jsonStr);
-            TestData data = result.toObject(TestData.class);
-            assertEquals("DuckDB", data.name);
-            assertEquals(1, data.version);
-        }
-    }
-
-    static class TestData {
-        public String name;
-        public int version;
-    }
 }

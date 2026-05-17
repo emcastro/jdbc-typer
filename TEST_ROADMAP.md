@@ -5,15 +5,14 @@
 - All tests use **in-memory DuckDB** (`jdbc:duckdb:`) for real integration testing.
 - **Mockito** is used for unit tests where a full database is unnecessary (registry logic, wrapper delegation).
 - DuckDB **spatial extension** is loaded for geometry tests (`INSTALL spatial; LOAD spatial;`).
-- DuckDB **JSON** is a core type (no extension needed), physically stored as `VARCHAR`.
+- DuckDB **JSON** is a core type (no extension needed), physically stored as `TEXT`.
 
 ## DuckDB Type Mapping
 
-| Application Type | DuckDB SQL Type | JDBC Java Type | Transformer Strategy |
-|---|---|---|---|
-| `JsonBox` | `JSON` | `String` | `toSql`: serialize to JSON string; `fromSql`: parse JSON string |
-| `org.locationtech.jts.geom.Point` | `GEOMETRY` | `String` (WKT) | `toSql`: `ST_GeomFromText(WKT)`; `fromSql`: `ST_AsText()` returns WKT |
-| `org.locationtech.jts.geom.LineString` | `GEOMETRY` | `String` (WKT) | Same as Point |
+| App Type | Column Type | Read SQL Type | Write SQL Type | Write Strategy | Read Strategy |
+|---|---|---|---|---|---|---|
+| `JsonBox` | `JSON` | `JsonNode` | `String` | `.value()` → `String` via `setObject` | `JsonNode.toString()` → `JsonBox` via `getObject(int)` (no type hint) |
+| `Point` / `LineString` | `GEOMETRY` | — (blocked) | `byte[]` (WKB) | `WKBWriter.write()` → `ST_GeomFromWKB(?)` | — (DuckDB `getObject(int, Class)` unsupported) |
 
 ## Test Suites
 
@@ -42,7 +41,7 @@
 - Read back via `RetyperResultSet.getObject(columnIndex, Point.class)`
 - Insert JTS `LineString` and read back
 - Null geometry round-trip
-- `ST_AsText()` and `ST_GeomFromText()` compatibility
+- Blob/WKB binary format compatibility
 
 ### 4. `RetyperResultSetTest` (Mockito unit tests)
 - `getObject(int, Class)` delegates with `registry.mapType()` and `registry.fromSql()`

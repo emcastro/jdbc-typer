@@ -255,12 +255,26 @@ public class RetyperCallableStatement extends RetyperPreparedStatement implement
 
     @Override
     public <T> T getObject(int parameterIndex, Class<T> type) throws SQLException {
-        return registry.fromSql(callableStatement().getObject(parameterIndex, registry.mapType(type)), type);
+        Object object;
+        var mappedType = registry.mapType(type);
+        if (mappedType == null) {
+            object = callableStatement().getObject(parameterIndex);
+        } else {
+            object = callableStatement().getObject(parameterIndex, mappedType);
+        }
+        return registry.fromSql(object, type);
     }
 
     @Override
     public <T> T getObject(String parameterName, Class<T> type) throws SQLException {
-        return registry.fromSql(callableStatement().getObject(parameterName, registry.mapType(type)), type);
+        Object object;
+        var mappedType = registry.mapType(type);
+        if (mappedType == null) {
+            object = callableStatement().getObject(parameterName);
+        } else {
+            object = callableStatement().getObject(parameterName, mappedType);
+        }
+        return registry.fromSql(object, type);
     }
 
     @Override

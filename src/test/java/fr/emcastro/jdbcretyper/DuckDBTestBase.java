@@ -6,8 +6,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import fr.emcastro.jdbcretyper.jdbc.RetyperConnection;
-import fr.emcastro.jdbcretyper.transform.GeometryTypeTransformer;
-import fr.emcastro.jdbcretyper.transform.JsonBoxTypeTransformer;
+import fr.emcastro.jdbcretyper.transform.GeometryReadTransformer;
+import fr.emcastro.jdbcretyper.transform.GeometryWriteTransformer;
+import fr.emcastro.jdbcretyper.transform.JsonBoxReadTransformer;
+import fr.emcastro.jdbcretyper.transform.JsonBoxWriteTransformer;
 import fr.emcastro.jdbcretyper.transform.TypeTransformerRegistry;
 
 /**
@@ -21,8 +23,10 @@ public abstract class DuckDBTestBase {
 
     protected void setUp() throws SQLException {
         registry = new TypeTransformerRegistry();
-        registry.register(new JsonBoxTypeTransformer());
-        registry.register(new GeometryTypeTransformer());
+        registry.registerRead(new JsonBoxReadTransformer());
+        registry.registerWrite(new JsonBoxWriteTransformer());
+        registry.registerRead(new GeometryReadTransformer());
+        registry.registerWrite(new GeometryWriteTransformer());
 
         Connection raw = DriverManager.getConnection("jdbc:duckdb:");
         connection = new RetyperConnection(raw, registry);

@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
-import fr.emcastro.jdbcretyper.demo.transform.JsonBoxTypeTransformer;
+import fr.emcastro.jdbcretyper.demo.transform.JsonBoxReadTransformer;
+import fr.emcastro.jdbcretyper.demo.transform.JsonBoxWriteTransformer;
 import fr.emcastro.jdbcretyper.jdbc.RetyperDatasource;
 import fr.emcastro.jdbcretyper.transform.TypeTransformerRegistry;
 
@@ -16,7 +17,8 @@ public class JdbcConfig {
     @Bean
     public JdbcClient jdbcClient(DataSource dataSource) {
         TypeTransformerRegistry registry = new TypeTransformerRegistry();
-        registry.register(new JsonBoxTypeTransformer());
+        registry.registerRead(new JsonBoxReadTransformer());
+        registry.registerWrite(new JsonBoxWriteTransformer());
         return JdbcClient.create(new RetyperDatasource(dataSource, registry));
     }
 }

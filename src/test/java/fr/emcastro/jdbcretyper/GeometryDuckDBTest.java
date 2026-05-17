@@ -40,18 +40,17 @@ class GeometryDuckDBTest extends DuckDBTestBase {
     @Test
     void insertAndReadPoint() throws SQLException {
         Point point = gf.createPoint(new Coordinate(30.0, 10.0));
-        String wkt = (String) registry.toSql(point);
 
         try (PreparedStatement ps =
-                connection.prepareStatement("INSERT INTO geom_test VALUES (1, ST_GeomFromText('" + wkt + "'))")) {
+                connection.prepareStatement("INSERT INTO geom_test VALUES (1, ST_GeomFromWKB(?))")) {
+            ps.setObject(1, point);
             ps.execute();
         }
 
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT ST_AsText(geom) FROM geom_test WHERE id = 1")) {
+                ResultSet rs = stmt.executeQuery("SELECT geom FROM geom_test WHERE id = 1")) {
             assertTrue(rs.next());
-            String wktResult = rs.getString(1);
-            Point result = (Point) registry.fromSql(wktResult, Point.class);
+            Point result = rs.getObject(1, Point.class);
             assertEquals(30.0, result.getX(), 0.001);
             assertEquals(10.0, result.getY(), 0.001);
         }
@@ -61,18 +60,17 @@ class GeometryDuckDBTest extends DuckDBTestBase {
     void insertAndReadLineString() throws SQLException {
         LineString line = gf.createLineString(
                 new Coordinate[] {new Coordinate(0, 0), new Coordinate(1, 1), new Coordinate(2, 0)});
-        String wkt = (String) registry.toSql(line);
 
         try (PreparedStatement ps =
-                connection.prepareStatement("INSERT INTO geom_test VALUES (2, ST_GeomFromText('" + wkt + "'))")) {
+                connection.prepareStatement("INSERT INTO geom_test VALUES (2, ST_GeomFromWKB(?))")) {
+            ps.setObject(1, line);
             ps.execute();
         }
 
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT ST_AsText(geom) FROM geom_test WHERE id = 2")) {
+                ResultSet rs = stmt.executeQuery("SELECT geom FROM geom_test WHERE id = 2")) {
             assertTrue(rs.next());
-            String wktResult = rs.getString(1);
-            LineString result = (LineString) registry.fromSql(wktResult, LineString.class);
+            LineString result = rs.getObject(1, LineString.class);
             assertEquals(3, result.getNumPoints());
             assertEquals(0, result.getCoordinateN(0).x, 0.001);
             assertEquals(2, result.getCoordinateN(2).x, 0.001);
@@ -86,28 +84,27 @@ class GeometryDuckDBTest extends DuckDBTestBase {
         }
 
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT ST_AsText(geom) FROM geom_test WHERE id = 3")) {
+                ResultSet rs = stmt.executeQuery("SELECT geom FROM geom_test WHERE id = 3")) {
             assertTrue(rs.next());
-            String wktResult = rs.getString(1);
-            assertNull(wktResult);
+            Object result = rs.getObject(1);
+            assertNull(result);
         }
     }
 
     @Test
     void geometryFromSqlWithType() throws SQLException {
         Point point = gf.createPoint(new Coordinate(45.0, -12.0));
-        String wkt = (String) registry.toSql(point);
 
         try (PreparedStatement ps =
-                connection.prepareStatement("INSERT INTO geom_test VALUES (4, ST_GeomFromText('" + wkt + "'))")) {
+                connection.prepareStatement("INSERT INTO geom_test VALUES (4, ST_GeomFromWKB(?))")) {
+            ps.setObject(1, point);
             ps.execute();
         }
 
         try (Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT ST_AsText(geom) FROM geom_test WHERE id = 4")) {
+                ResultSet rs = stmt.executeQuery("SELECT geom FROM geom_test WHERE id = 4")) {
             assertTrue(rs.next());
-            String wktResult = rs.getString(1);
-            Point result = registry.fromSql(wktResult, Point.class);
+            Point result = registry.fromSql(rs.getObject(1), Point.class);
             assertEquals(45.0, result.getX(), 0.001);
             assertEquals(-12.0, result.getY(), 0.001);
         }

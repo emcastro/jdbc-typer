@@ -961,12 +961,26 @@ public class RetyperResultSet implements ResultSet {
 
     @Override
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
-        return registry.fromSql(resultSet.getObject(columnIndex, registry.mapType(type)), type);
+        Object object;
+        var mappedType = registry.mapType(type);
+        if (mappedType == null) {
+            object = resultSet.getObject(columnIndex);
+        } else {
+            object = resultSet.getObject(columnIndex, mappedType);
+        }
+        return registry.fromSql(object, type);
     }
 
     @Override
     public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
-        return registry.fromSql(resultSet.getObject(columnLabel, registry.mapType(type)), type);
+        Object object;
+        var mappedType = registry.mapType(type);
+        if (mappedType == null) {
+            object = resultSet.getObject(columnLabel);
+        } else {
+            object = resultSet.getObject(columnLabel, mappedType);
+        }
+        return registry.fromSql(object, type);
     }
 
     @Override
@@ -990,6 +1004,11 @@ public class RetyperResultSet implements ResultSet {
         resultSet.updateObject(columnLabel, registry.toSql(x), targetSqlType);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Follows the HikariCP wrapper pattern: unwraps to this wrapper if it implements the
+     * requested type, otherwise delegates to the underlying JDBC driver recursively.</p>
+     */
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         if (iface.isInstance(resultSet)) {
@@ -998,6 +1017,11 @@ public class RetyperResultSet implements ResultSet {
         return resultSet.unwrap(iface);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Follows the HikariCP wrapper pattern: returns {@code true} if this wrapper itself
+     * implements the requested type, or delegates to the underlying JDBC driver.</p>
+     */
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return iface.isInstance(resultSet) || resultSet.isWrapperFor(iface);
