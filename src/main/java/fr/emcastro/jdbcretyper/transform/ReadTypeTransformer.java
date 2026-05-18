@@ -6,8 +6,13 @@ package fr.emcastro.jdbcretyper.transform;
  * <p>Implementations are registered in {@link TypeTransformerRegistry#registerRead(ReadTypeTransformer)}
  * and are invoked automatically by {@code RetyperResultSet} when reading results.
  *
+ * <p>The read SQL type ({@link #getReadSqlType()}) and the write SQL type
+ * ({@link WriteTypeTransformer#getWriteSqlType()}) can differ. This is intentional:
+ * a driver may return values in one form when reading (e.g. DuckDB returns {@code JsonNode}
+ * for JSON columns) but accept a different form when writing (e.g. a plain {@code String}).
+ *
  * @param <A> the application type (e.g. {@code JsonBox}, {@code Point})
- * @param <S> the JDBC SQL type returned by the driver (e.g. {@code String}, {@code Blob})
+ * @param <S> the JDBC SQL type returned by the driver (e.g. {@code JsonNode}, {@code Geometry})
  */
 public interface ReadTypeTransformer<A, S> {
 
@@ -28,7 +33,9 @@ public interface ReadTypeTransformer<A, S> {
      */
     Class<S> getReadSqlType();
 
-    default boolean jdbcDriverIsTypeAware() { return true;}
+    default boolean jdbcDriverIsTypeAware() {
+        return true;
+    }
 
     /**
      * Converts a JDBC value to the application type.

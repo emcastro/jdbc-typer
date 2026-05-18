@@ -6,6 +6,11 @@ package fr.emcastro.jdbcretyper.transform;
  * <p>Implementations are registered in {@link TypeTransformerRegistry#registerWrite(WriteTypeTransformer)}
  * and are invoked automatically by {@code RetyperPreparedStatement} when writing parameters.
  *
+ * <p>The write SQL type ({@link #getWriteSqlType()}) and the read SQL type
+ * ({@link ReadTypeTransformer#getReadSqlType()}) can differ. This is intentional:
+ * a driver may require a different type for {@code setObject()} (e.g. a plain {@code String}
+ * for JSON columns) than what it returns when reading (e.g. DuckDB returns {@code JsonNode}).
+ *
  * @param <A> the application type (e.g. {@code JsonBox}, {@code Point})
  * @param <P> the JDBC parameter type used for {@code setObject()} (e.g. {@code String}, {@code byte[]})
  */

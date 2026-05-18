@@ -92,7 +92,4 @@ class JsonBoxDuckDBTest extends DuckDBTestBase {
             assertTrue(rs.wasNull());
         }
     }
-
-
-
 }

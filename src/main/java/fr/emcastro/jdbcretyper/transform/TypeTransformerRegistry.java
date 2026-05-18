@@ -46,8 +46,7 @@ public class TypeTransformerRegistry {
      */
     @SuppressWarnings("unchecked")
     public Object toSql(Object appValue) {
-        if (appValue == null)
-            return null;
+        if (appValue == null) return null;
         for (WriteTypeTransformer<?, ?> t : writeTransformers) {
             if (t.getAppType().isInstance(appValue)) {
                 return t.getWriteSqlType().cast(((WriteTypeTransformer<Object, Object>) t).toSql(appValue));
@@ -69,8 +68,7 @@ public class TypeTransformerRegistry {
      */
     @SuppressWarnings("unchecked")
     public <T> T fromSql(Object sqlValue, Class<T> appType) {
-        if (sqlValue == null)
-            return null;
+        if (sqlValue == null) return null;
         for (ReadTypeTransformer<?, ?> t : readTransformers) {
             if (t.getAppType().isAssignableFrom(appType) && t.getReadSqlType().isInstance(sqlValue)) {
                 return appType.cast(((ReadTypeTransformer<T, Object>) t).fromSql(sqlValue));
@@ -94,8 +92,7 @@ public class TypeTransformerRegistry {
      */
     @SuppressWarnings("unchecked")
     public Object fromSqlDefaultType(Object sqlValue) {
-        if (sqlValue == null)
-            return null;
+        if (sqlValue == null) return null;
         for (ReadTypeTransformer<?, ?> t : readTransformers) {
             if (t.getReadSqlType().isInstance(sqlValue)) {
                 return t.getAppType().cast(((ReadTypeTransformer<Object, Object>) t).fromSql(sqlValue));

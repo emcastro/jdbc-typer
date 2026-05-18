@@ -2,13 +2,14 @@ package fr.emcastro.jdbcretyper.demo.transform;
 
 import fr.emcastro.jdbcretyper.demo.JsonBox;
 import fr.emcastro.jdbcretyper.transform.ReadTypeTransformer;
+import org.duckdb.JsonNode;
 
 /**
- * Reads {@link JsonBox} from JDBC {@link String} columns for the demo.
+ * Reads {@link JsonBox} from JDBC {@link JsonNode} columns for the demo.
  *
- * <p>DuckDB stores JSON physically as TEXT, so the read SQL type is {@code String.class}.
+ * <p>DuckDB stores JSON physically as TEXT, so the read SQL type is {@code JsonNode.class}.
  */
-public class JsonBoxReadTransformer implements ReadTypeTransformer<JsonBox, org.duckdb. JsonNode    > {
+public class JsonBoxReadTransformer implements ReadTypeTransformer<JsonBox, JsonNode> {
 
     @Override
     public Class<JsonBox> getAppType() {
@@ -16,12 +17,17 @@ public class JsonBoxReadTransformer implements ReadTypeTransformer<JsonBox, org.
     }
 
     @Override
-    public Class<String> getReadSqlType() {
-        return String.class;
+    public Class<JsonNode> getReadSqlType() {
+        return JsonNode.class;
     }
 
     @Override
-    public JsonBox fromSql(String sqlValue) {
-        return new JsonBox(sqlValue);
+    public boolean jdbcDriverIsTypeAware() {
+        return false;
+    }
+
+    @Override
+    public JsonBox fromSql(JsonNode sqlValue) {
+        return new JsonBox(sqlValue.toString());
     }
 }

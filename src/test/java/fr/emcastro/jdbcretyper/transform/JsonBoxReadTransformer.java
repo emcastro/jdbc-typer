@@ -1,7 +1,8 @@
 package fr.emcastro.jdbcretyper.transform;
 
-import fr.emcastro.jdbcretyper.JsonBox;
 import org.duckdb.JsonNode;
+
+import fr.emcastro.jdbcretyper.JsonBox;
 
 /**
  * Reads {@link JsonBox} from JDBC {@link String} columns.
