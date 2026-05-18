@@ -2,6 +2,8 @@ package fr.emcastro.jdbcretyper.transform;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -124,6 +126,29 @@ class TypeTransformerRegistryTest {
         assertNull(registry.fromSqlMap(null));
     }
 
+    @Test
+    // Check that mapType() returns null when the registered read
+    // transformer has supportsTypedGetObject() = false.
+    void mapType_returnsNullWhenSupportsTypedGetObjectIsFalse() {
+        registry.registerRead(new TestReadTransformerNoTypeHint());
+        Class<?> result = registry.mapType(TestAppValueNoHint.class);
+        assertNull(result);
+    }
+
+    @Test
+    // Check that fromSqlMap() silently drops entries whose transformer
+    // has supportsTypedGetObject() = false, returning a smaller map.
+    void fromSqlMap_dropsEntriesWhenSupportsTypedGetObjectIsFalse() {
+        registry.registerRead(new TestReadTransformerNoTypeHint());
+        Map<String, Class<?>> map = new java.util.HashMap<>();
+        map.put("col1", TestAppValue.class);
+        map.put("col2", TestAppValueNoHint.class);
+        Map<String, Class<?>> result = registry.fromSqlMap(map);
+        assertEquals(1, result.size());
+        assertEquals(String.class, result.get("col1"));
+        assertNull(result.get("col2"));
+    }
+
     /**
      * Test transformer: TestAppValue <-> String with "SQL:" prefix.
      */
@@ -144,6 +169,34 @@ class TypeTransformerRegistryTest {
         @Override
         public TestAppValue fromSql(String sqlValue) {
             return new TestAppValue(sqlValue);
+        }
+    }
+
+    /**
+     * Test read transformer with supportsTypedGetObject() = false.
+     */
+    record TestAppValueNoHint(String value) {}
+
+    static class TestReadTransformerNoTypeHint implements ReadTypeTransformer<TestAppValueNoHint, String> {
+
+        @Override
+        public Class<TestAppValueNoHint> getAppType() {
+            return TestAppValueNoHint.class;
+        }
+
+        @Override
+        public Class<String> getReadSqlType() {
+            return String.class;
+        }
+
+        @Override
+        public boolean supportsTypedGetObject() {
+            return false;
+        }
+
+        @Override
+        public TestAppValueNoHint fromSql(String sqlValue) {
+            return new TestAppValueNoHint(sqlValue);
         }
     }
 

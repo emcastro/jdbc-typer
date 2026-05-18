@@ -1,4 +1,4 @@
-## General directives
+A## General directives
 
 - Use `graphify query`/`path`/`explain` for codebase questions when graphify-out/graph.json
   exists; fall back to explore/general agents only if graphify is unavailable or insufficient

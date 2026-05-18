@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLType;
+import java.sql.Statement;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -153,5 +155,64 @@ class RetyperResultSetTest {
         when(mockResultSet.wasNull()).thenReturn(true);
 
         assertTrue(retyperResultSet.wasNull());
+    }
+
+    @Test
+    // Check that plain getObject(String) routes the raw driver value
+    // through fromSqlDefaultType() for untyped reads by label.
+    void getObject_defaultType_byLabel_usesFromSqlDefaultType() throws SQLException {
+        when(mockResultSet.getObject("col")).thenReturn("raw-value");
+
+        retyperResultSet.getObject("col");
+
+        verify(registry).fromSqlDefaultType("raw-value");
+    }
+
+    @Test
+    // Check that updateObject(String, Object) converts the value via
+    // toSql() before passing it to the delegate.
+    void updateObject_byLabel_usesToSql() throws SQLException {
+        Object value = new Object();
+        when(registry.toSql(value)).thenReturn(value);
+
+        retyperResultSet.updateObject("col", value);
+
+        verify(registry).toSql(value);
+    }
+
+    @Test
+    // Check that updateObject(int, Object, SQLType) converts the value
+    // via toSql() before passing it to the delegate.
+    void updateObject_withSqlType_usesToSql() throws SQLException {
+        Object value = new Object();
+        when(registry.toSql(value)).thenReturn(value);
+        SQLType sqlType = mock(SQLType.class);
+
+        retyperResultSet.updateObject(1, value, sqlType);
+
+        verify(registry).toSql(value);
+    }
+
+    @Test
+    // Check that updateObject(String, Object, SQLType, int) converts
+    // the value via toSql() before passing it to the delegate.
+    void updateObject_byLabel_withSqlTypeAndScale_usesToSql() throws SQLException {
+        Object value = new Object();
+        when(registry.toSql(value)).thenReturn(value);
+        SQLType sqlType = mock(SQLType.class);
+
+        retyperResultSet.updateObject("col", value, sqlType, 2);
+
+        verify(registry).toSql(value);
+    }
+
+    @Test
+    // Check that getStatement() returns the wrapping Statement passed
+    // to the constructor, not the underlying driver's Statement.
+    void getStatement_returnsWrapper() throws SQLException {
+        Statement mockStatement = mock(Statement.class);
+        RetyperResultSet rsWithStatement = new RetyperResultSet(mockResultSet, registry, mockStatement);
+
+        assertSame(mockStatement, rsWithStatement.getStatement());
     }
 }
