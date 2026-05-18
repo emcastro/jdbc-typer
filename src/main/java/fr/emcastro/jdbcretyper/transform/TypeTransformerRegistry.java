@@ -7,6 +7,24 @@ import java.util.Map;
 
 import fr.emcastro.jdbcretyper.exception.TypeConversionException;
 
+/**
+ * Maintains two independent lists of type transformers — one for reading (JDBC
+ * → application) and one for writing (application → JDBC).
+ *
+ * <p>The read path ({@link #fromSql(Object, Class)}) matches by both the
+ * driver's return type and the target application type. This is necessary
+ * because different SQL types may require different transformers even for the
+ * same application type.
+ *
+ * <p>The write path ({@link #toSql(Object)}) matches by application type only.
+ * The transformer's declared write SQL type is used purely as a cast target —
+ * the registry does not inspect the value's runtime type on the write side.
+ *
+ * <p>The read SQL type ({@link ReadTypeTransformer#getReadSqlType()}) and the
+ * write SQL type ({@link WriteTypeTransformer#getWriteSqlType()}) can differ for
+ * a given application type. This asymmetry is handled transparently by the
+ * two-list dispatch above.
+ */
 public class TypeTransformerRegistry {
 
     private final List<ReadTypeTransformer<?, ?>> readTransformers = new ArrayList<>();

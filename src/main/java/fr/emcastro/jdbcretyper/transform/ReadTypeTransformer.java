@@ -10,6 +10,8 @@ package fr.emcastro.jdbcretyper.transform;
  * ({@link WriteTypeTransformer#getWriteSqlType()}) can differ. This is intentional:
  * a driver may return values in one form when reading (e.g. DuckDB returns {@code JsonNode}
  * for JSON columns) but accept a different form when writing (e.g. a plain {@code String}).
+ * The {@link TypeTransformerRegistry} dispatches each direction independently,
+ * so these two types never need to match.
  *
  * @param <A> the application type (e.g. {@code JsonBox}, {@code Point})
  * @param <S> the JDBC SQL type returned by the driver (e.g. {@code JsonNode}, {@code Geometry})

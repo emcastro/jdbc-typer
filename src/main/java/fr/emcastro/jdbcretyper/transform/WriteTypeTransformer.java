@@ -10,6 +10,8 @@ package fr.emcastro.jdbcretyper.transform;
  * ({@link ReadTypeTransformer#getReadSqlType()}) can differ. This is intentional:
  * a driver may require a different type for {@code setObject()} (e.g. a plain {@code String}
  * for JSON columns) than what it returns when reading (e.g. DuckDB returns {@code JsonNode}).
+ * The {@link TypeTransformerRegistry} dispatches each direction independently,
+ * so these two types never need to match.
  *
  * @param <A> the application type (e.g. {@code JsonBox}, {@code Point})
  * @param <P> the JDBC parameter type used for {@code setObject()} (e.g. {@code String}, {@code byte[]})
