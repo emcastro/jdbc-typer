@@ -13,8 +13,6 @@ import org.locationtech.jts.io.WKBWriter;
  */
 public class GeometryWriteTransformer implements WriteTypeTransformer<Geometry, byte[]> {
 
-    private final WKBWriter wkbWriter = new WKBWriter();
-
     @Override
     public Class<Geometry> getAppType() {
         return Geometry.class;
@@ -27,6 +25,6 @@ public class GeometryWriteTransformer implements WriteTypeTransformer<Geometry, 
 
     @Override
     public byte[] toSql(Geometry appValue) {
-        return wkbWriter.write(appValue);
+        return new WKBWriter().write(appValue);
     }
 }
