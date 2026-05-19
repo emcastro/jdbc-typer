@@ -3,6 +3,7 @@ package fr.emcastro.jdbcretyper.jdbc;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -78,5 +79,49 @@ class RetyperStatementTest {
     // passed to the constructor, not the underlying driver's Connection.
     void getConnection_returnsWrapper() throws SQLException {
         assertSame(mockConnection, statement.getConnection());
+    }
+
+    // --- Unwrap / isWrapperFor ---
+
+    @Test
+    // Check that unwrap(Class) returns the underlying Statement when
+    // it implements the requested type.
+    void unwrap_returnsWrappedIfInstance() throws SQLException {
+        assertSame(mockStatement, statement.unwrap(Statement.class));
+    }
+
+    @Test
+    // Check that unwrap(Class) delegates to the underlying Statement
+    // when it doesn't implement the requested type.
+    void unwrap_delegatesWhenNotInstance() throws SQLException {
+        DatabaseMetaData expected = mock(DatabaseMetaData.class);
+        when(mockStatement.unwrap(DatabaseMetaData.class)).thenReturn(expected);
+        assertSame(expected, statement.unwrap(DatabaseMetaData.class));
+        verify(mockStatement).unwrap(DatabaseMetaData.class);
+    }
+
+    @Test
+    // Check that isWrapperFor(Class) returns true when the underlying
+    // Statement implements the requested type.
+    void isWrapperFor_trueForWrappedInstance() throws SQLException {
+        assertTrue(statement.isWrapperFor(Statement.class));
+    }
+
+    @Test
+    // Check that isWrapperFor(Class) delegates to the underlying
+    // Statement when it doesn't implement the requested type.
+    void isWrapperFor_delegatesWhenNotInstance() throws SQLException {
+        when(mockStatement.isWrapperFor(DatabaseMetaData.class)).thenReturn(true);
+        assertTrue(statement.isWrapperFor(DatabaseMetaData.class));
+        verify(mockStatement).isWrapperFor(DatabaseMetaData.class);
+    }
+
+    @Test
+    // Check that isWrapperFor(Class) returns false when neither the
+    // Statement nor the underlying delegate implements the type.
+    void isWrapperFor_returnsFalseWhenNeitherImplements() throws SQLException {
+        when(mockStatement.isWrapperFor(DatabaseMetaData.class)).thenReturn(false);
+        assertFalse(statement.isWrapperFor(DatabaseMetaData.class));
+        verify(mockStatement).isWrapperFor(DatabaseMetaData.class);
     }
 }

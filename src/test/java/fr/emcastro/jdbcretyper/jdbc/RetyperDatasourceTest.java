@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
@@ -53,6 +54,8 @@ class RetyperDatasourceTest {
         assertInstanceOf(RetyperConnection.class, datasource.getConnection("user", "pass"));
     }
 
+    // --- Unwrap / isWrapperFor ---
+
     @Test
     // Check that unwrap(DataSource.class) returns the underlying driver
     // DataSource when the requested type matches the delegate.
@@ -65,5 +68,33 @@ class RetyperDatasourceTest {
     // wrapped DataSource implements that interface.
     void isWrapperFor_trueForWrappedInstance() throws SQLException {
         assertTrue(datasource.isWrapperFor(DataSource.class));
+    }
+
+    @Test
+    // Check that unwrap(Class) delegates to the underlying DataSource
+    // when it doesn't implement the requested type.
+    void unwrap_delegatesWhenNotInstance() throws SQLException {
+        DatabaseMetaData expected = mock(DatabaseMetaData.class);
+        when(mockDataSource.unwrap(DatabaseMetaData.class)).thenReturn(expected);
+        assertSame(expected, datasource.unwrap(DatabaseMetaData.class));
+        verify(mockDataSource).unwrap(DatabaseMetaData.class);
+    }
+
+    @Test
+    // Check that isWrapperFor(Class) delegates to the underlying
+    // DataSource when it doesn't implement the requested type.
+    void isWrapperFor_delegatesWhenNotInstance() throws SQLException {
+        when(mockDataSource.isWrapperFor(DatabaseMetaData.class)).thenReturn(true);
+        assertTrue(datasource.isWrapperFor(DatabaseMetaData.class));
+        verify(mockDataSource).isWrapperFor(DatabaseMetaData.class);
+    }
+
+    @Test
+    // Check that isWrapperFor(Class) returns false when neither the
+    // DataSource nor the underlying delegate implements the type.
+    void isWrapperFor_returnsFalseWhenNeitherImplements() throws SQLException {
+        when(mockDataSource.isWrapperFor(DatabaseMetaData.class)).thenReturn(false);
+        assertFalse(datasource.isWrapperFor(DatabaseMetaData.class));
+        verify(mockDataSource).isWrapperFor(DatabaseMetaData.class);
     }
 }

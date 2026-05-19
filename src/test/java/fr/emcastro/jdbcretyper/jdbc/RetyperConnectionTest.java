@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -69,6 +70,8 @@ class RetyperConnectionTest {
 
         assertInstanceOf(RetyperCallableStatement.class, connection.prepareCall("{call proc()}"));
     }
+
+    // --- Unwrap / isWrapperFor ---
 
     @Test
     // Check that unwrap(Connection.class) returns the underlying driver
@@ -200,5 +203,33 @@ class RetyperConnectionTest {
                         ResultSet.TYPE_FORWARD_ONLY,
                         ResultSet.CONCUR_READ_ONLY,
                         ResultSet.CLOSE_CURSORS_AT_COMMIT));
+    }
+
+    @Test
+    // Check that unwrap(Class) delegates to the underlying Connection
+    // when it doesn't implement the requested type.
+    void unwrap_delegatesWhenNotInstance() throws SQLException {
+        DatabaseMetaData expected = mock(DatabaseMetaData.class);
+        when(mockConnection.unwrap(DatabaseMetaData.class)).thenReturn(expected);
+        assertSame(expected, connection.unwrap(DatabaseMetaData.class));
+        verify(mockConnection).unwrap(DatabaseMetaData.class);
+    }
+
+    @Test
+    // Check that isWrapperFor(Class) delegates to the underlying
+    // Connection when it doesn't implement the requested type.
+    void isWrapperFor_delegatesWhenNotInstance() throws SQLException {
+        when(mockConnection.isWrapperFor(DatabaseMetaData.class)).thenReturn(true);
+        assertTrue(connection.isWrapperFor(DatabaseMetaData.class));
+        verify(mockConnection).isWrapperFor(DatabaseMetaData.class);
+    }
+
+    @Test
+    // Check that isWrapperFor(Class) returns false when neither the
+    // Connection nor the underlying delegate implements the type.
+    void isWrapperFor_returnsFalseWhenNeitherImplements() throws SQLException {
+        when(mockConnection.isWrapperFor(DatabaseMetaData.class)).thenReturn(false);
+        assertFalse(connection.isWrapperFor(DatabaseMetaData.class));
+        verify(mockConnection).isWrapperFor(DatabaseMetaData.class);
     }
 }

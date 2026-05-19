@@ -3,6 +3,7 @@ package fr.emcastro.jdbcretyper.jdbc;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
@@ -157,6 +158,8 @@ class RetyperResultSetTest {
         verify(registry).toSql(value);
     }
 
+    // --- Unwrap / isWrapperFor ---
+
     @Test
     // Check that unwrap(ResultSet.class) returns the underlying driver
     // ResultSet when the requested type matches the delegate.
@@ -273,5 +276,33 @@ class RetyperResultSetTest {
         RetyperResultSet rsWithStatement = new RetyperResultSet(mockResultSet, registry, mockStatement);
 
         assertSame(mockStatement, rsWithStatement.getStatement());
+    }
+
+    @Test
+    // Check that unwrap(Class) delegates to the underlying ResultSet
+    // when it doesn't implement the requested type.
+    void unwrap_delegatesWhenNotInstance() throws SQLException {
+        DatabaseMetaData expected = mock(DatabaseMetaData.class);
+        when(mockResultSet.unwrap(DatabaseMetaData.class)).thenReturn(expected);
+        assertSame(expected, retyperResultSet.unwrap(DatabaseMetaData.class));
+        verify(mockResultSet).unwrap(DatabaseMetaData.class);
+    }
+
+    @Test
+    // Check that isWrapperFor(Class) delegates to the underlying
+    // ResultSet when it doesn't implement the requested type.
+    void isWrapperFor_delegatesWhenNotInstance() throws SQLException {
+        when(mockResultSet.isWrapperFor(DatabaseMetaData.class)).thenReturn(true);
+        assertTrue(retyperResultSet.isWrapperFor(DatabaseMetaData.class));
+        verify(mockResultSet).isWrapperFor(DatabaseMetaData.class);
+    }
+
+    @Test
+    // Check that isWrapperFor(Class) returns false when neither the
+    // ResultSet nor the underlying delegate implements the type.
+    void isWrapperFor_returnsFalseWhenNeitherImplements() throws SQLException {
+        when(mockResultSet.isWrapperFor(DatabaseMetaData.class)).thenReturn(false);
+        assertFalse(retyperResultSet.isWrapperFor(DatabaseMetaData.class));
+        verify(mockResultSet).isWrapperFor(DatabaseMetaData.class);
     }
 }

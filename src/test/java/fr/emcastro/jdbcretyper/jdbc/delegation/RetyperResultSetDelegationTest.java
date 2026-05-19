@@ -1814,20 +1814,4 @@ class RetyperResultSetDelegationTest {
         rs.updateObject("col", "value", sqlType);
         verify(mockResultSet).updateObject(eq("col"), any(), eq(sqlType));
     }
-
-    // --- Unwrap ---
-
-    @Test
-    // Check that unwrap(Class) returns the underlying ResultSet when
-    // it implements the requested type.
-    void unwrap_returnsUnderlyingWhenInstance() throws SQLException {
-        assertSame(mockResultSet, rs.unwrap(ResultSet.class));
-    }
-
-    @Test
-    // Check that isWrapperFor(Class) returns true when the underlying
-    // ResultSet implements the requested type.
-    void isWrapperFor_returnsTrueWhenInstance() throws SQLException {
-        assertTrue(rs.isWrapperFor(ResultSet.class));
-    }
 }
